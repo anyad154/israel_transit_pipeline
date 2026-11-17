@@ -1,9 +1,8 @@
 from pathlib import Path
 from typing import Literal
+from urllib.parse import quote
 
-from urllib.parse import quote_plus
-
-from pydantic import SecretStr
+from pydantic import SecretStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,7 +16,7 @@ class Settings(BaseSettings):
     postgres_db: str = "transit"
     postgres_host: str = "localhost"
     postgres_port: int = 5432
-    postgres_password: SecretStr  # no default: must come from the environment
+    postgres_password: SecretStr = Field(min_length=1) # no default: must come from the environment
 
     # Storage
     data_dir: Path = Path("./data")
@@ -32,9 +31,10 @@ class Settings(BaseSettings):
     @property
     def postgres_dsn(self) -> str:
         """Connection string, e.g. postgresql://user:pass@host:5432/db"""
-        encoded_password = quote_plus(self.postgres_password.get_secret_value(), safe="")
+        encoded_password = quote(self.postgres_password.get_secret_value(), safe="")
+        encoded_username = quote(self.postgres_user, safe="")
         return (
-            f"postgresql://{self.postgres_user}:{encoded_password}@"
+            f"postgresql://{encoded_username}:{encoded_password}@"
             f"{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
