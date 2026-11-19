@@ -37,6 +37,7 @@ def test_password_round_trips_through_dsn(password: str) -> None:
     assert unquote(parts.password) == password
     assert parts.hostname == "localhost"
 
+
 @pytest.mark.parametrize("user", ["simple", "data@team", "a/b", "my user"])
 def test_user_round_trips_through_dsn(user: str) -> None:
     s = Settings(
@@ -51,12 +52,23 @@ def test_user_round_trips_through_dsn(user: str) -> None:
     assert unquote(parts.username) == user
     assert parts.hostname == "localhost"
 
+
 def test_missing_password_raises(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("POSTGRES_PASSWORD", raising=False)
 
     with pytest.raises(ValidationError):
         Settings(
             _env_file=None,
+            gtfs_url="x",
+            stride_base_url="y",
+        )
+
+
+def test_empty_password_raises() -> None:
+    with pytest.raises(ValidationError):
+        Settings(
+            _env_file=None,
+            postgres_password="",
             gtfs_url="x",
             stride_base_url="y",
         )

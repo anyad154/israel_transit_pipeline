@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import quote
 
-from pydantic import SecretStr, Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,7 +16,9 @@ class Settings(BaseSettings):
     postgres_db: str = "transit"
     postgres_host: str = "localhost"
     postgres_port: int = 5432
-    postgres_password: SecretStr = Field(min_length=1) # no default: must come from the environment
+    postgres_password: SecretStr = Field(
+        min_length=1
+    )  # no default: must come from the environment
 
     # Storage
     data_dir: Path = Path("./data")
