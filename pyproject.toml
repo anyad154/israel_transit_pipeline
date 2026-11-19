@@ -28,3 +28,11 @@ dev = [
 
 [tool.poetry]
 packages = [{ include = "transit", from = "src" }]
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = false
